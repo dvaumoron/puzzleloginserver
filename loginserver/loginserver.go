@@ -20,6 +20,7 @@ package loginserver
 import (
 	"context"
 	"errors"
+	"strings"
 
 	"github.com/dvaumoron/puzzleloginserver/model"
 	pb "github.com/dvaumoron/puzzleloginservice"
@@ -122,6 +123,46 @@ func (s server) GetUsers(ctx context.Context, request *pb.UserIds) (*pb.Users, e
 		return nil, err
 	}
 	return &pb.Users{List: convertUsersFromModel(users)}, nil
+}
+
+func (s server) ListUsers(ctx context.Context, request *pb.RangeRequest) (*pb.Users, error) {
+	var total int64
+	err := s.db.Model(&model.User{}).Count(&total).Error
+	if err != nil {
+		return nil, err
+	}
+	if total == 0 {
+		return &pb.Users{}, nil
+	}
+
+	var users []model.User
+	page := s.paginate(request.Start, request.End)
+	if filter := request.Filter; filter == "" {
+		err = page.Find(&users).Error
+	} else {
+		var likeBuilder strings.Builder
+		likeBuilder.WriteByte('%')
+		likeBuilder.WriteString(filter)
+		likeBuilder.WriteByte('%')
+		err = page.Find(&users, "login LIKE ?", likeBuilder.String()).Error
+	}
+
+	if err != nil {
+		return nil, err
+	}
+	return &pb.Users{List: convertUsersFromModel(users), Total: uint64(total)}, nil
+}
+
+func (s server) Delete(ctx context.Context, request *pb.UserId) (*pb.Response, error) {
+	err := s.db.Delete(&model.User{}, request.Id).Error
+	if err != nil {
+		return nil, err
+	}
+	return &pb.Response{Success: true}, nil
+}
+
+func (s server) paginate(start uint64, end uint64) *gorm.DB {
+	return s.db.Offset(int(start)).Limit(int(end - start))
 }
 
 func convertUsersFromModel(users []model.User) []*pb.User {
