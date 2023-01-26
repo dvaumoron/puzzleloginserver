@@ -1,2 +1,5 @@
 # Dependency directories (remove the comment below to include it)
 # vendor/
+
+# Don't store generated test file
+*.db
