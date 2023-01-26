@@ -43,7 +43,7 @@ func salt(password string) string {
 
 func main() {
 	if len(os.Args) < 4 {
-		log.Print("Wait id, login, password for the initial admin user as argument")
+		log.Fatal("Wait id, login, password for the initial admin user as argument")
 	}
 
 	adminUserIdStr := os.Args[1]
