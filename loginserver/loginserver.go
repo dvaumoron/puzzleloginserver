@@ -118,7 +118,7 @@ func (s server) ChangePassword(ctx context.Context, request *pb.ChangePasswordRe
 
 func (s server) GetUsers(ctx context.Context, request *pb.UserIds) (*pb.Users, error) {
 	var users []model.User
-	err := s.db.Find(&users, "id IN (?)", request.Ids).Error
+	err := s.db.Find(&users, "id IN ?", request.Ids).Error
 	if err != nil {
 		return nil, err
 	}
