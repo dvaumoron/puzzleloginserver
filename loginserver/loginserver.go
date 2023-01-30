@@ -20,12 +20,17 @@ package loginserver
 import (
 	"context"
 	"errors"
+	"log"
 	"strings"
 
 	"github.com/dvaumoron/puzzleloginserver/model"
 	pb "github.com/dvaumoron/puzzleloginservice"
 	"gorm.io/gorm"
 )
+
+const dbAccessMsg = "Failed to access database :"
+
+var errInternal = errors.New("internal service error")
 
 type empty = struct{}
 
@@ -47,7 +52,9 @@ func (s server) Verify(ctx context.Context, request *pb.LoginRequest) (*pb.Respo
 			// unknown user, return false (bool default)
 			return &pb.Response{}, nil
 		}
-		return nil, err
+
+		log.Println(dbAccessMsg, err)
+		return nil, errInternal
 	}
 
 	if request.Salted != user.Password {
@@ -65,13 +72,15 @@ func (s server) Register(ctx context.Context, request *pb.LoginRequest) (*pb.Res
 	}
 	if !errors.Is(err, gorm.ErrRecordNotFound) {
 		// some technical error, send it
-		return nil, err
+		log.Println(dbAccessMsg, err)
+		return nil, errInternal
 	}
 
 	// unknown user, create new
 	user = model.User{Login: request.Login, Password: request.Salted}
 	if err = s.db.Create(&user).Error; err != nil {
-		return nil, err
+		log.Println(dbAccessMsg, err)
+		return nil, errInternal
 	}
 	return &pb.Response{Success: true, Id: user.ID}, nil
 }
@@ -84,14 +93,17 @@ func (s server) ChangeLogin(ctx context.Context, request *pb.ChangeLoginRequest)
 			// unknown user, return false (bool default)
 			return &pb.Response{}, nil
 		}
-		return nil, err
+
+		log.Println(dbAccessMsg, err)
+		return nil, errInternal
 	}
 
 	if request.Salted != user.Password {
 		return &pb.Response{}, nil
 	}
 	if err = s.db.Model(&user).Update("login", request.NewLogin).Error; err != nil {
-		return nil, err
+		log.Println(dbAccessMsg, err)
+		return nil, errInternal
 	}
 	return &pb.Response{Success: true}, nil
 }
@@ -104,14 +116,17 @@ func (s server) ChangePassword(ctx context.Context, request *pb.ChangePasswordRe
 			// unknown user, return false (bool default)
 			return &pb.Response{}, nil
 		}
-		return nil, err
+
+		log.Println(dbAccessMsg, err)
+		return nil, errInternal
 	}
 
 	if request.OldSalted != user.Password {
 		return &pb.Response{}, nil
 	}
 	if err = s.db.Model(&user).Update("password", request.NewSalted).Error; err != nil {
-		return nil, err
+		log.Println(dbAccessMsg, err)
+		return nil, errInternal
 	}
 	return &pb.Response{Success: true}, nil
 }
@@ -120,7 +135,8 @@ func (s server) GetUsers(ctx context.Context, request *pb.UserIds) (*pb.Users, e
 	var users []model.User
 	err := s.db.Find(&users, "id IN ?", request.Ids).Error
 	if err != nil {
-		return nil, err
+		log.Println(dbAccessMsg, err)
+		return nil, errInternal
 	}
 	return &pb.Users{List: convertUsersFromModel(users)}, nil
 }
@@ -129,7 +145,8 @@ func (s server) ListUsers(ctx context.Context, request *pb.RangeRequest) (*pb.Us
 	var total int64
 	err := s.db.Model(&model.User{}).Count(&total).Error
 	if err != nil {
-		return nil, err
+		log.Println(dbAccessMsg, err)
+		return nil, errInternal
 	}
 	if total == 0 {
 		return &pb.Users{}, nil
@@ -148,7 +165,8 @@ func (s server) ListUsers(ctx context.Context, request *pb.RangeRequest) (*pb.Us
 	}
 
 	if err != nil {
-		return nil, err
+		log.Println(dbAccessMsg, err)
+		return nil, errInternal
 	}
 	return &pb.Users{List: convertUsersFromModel(users), Total: uint64(total)}, nil
 }
@@ -156,7 +174,8 @@ func (s server) ListUsers(ctx context.Context, request *pb.RangeRequest) (*pb.Us
 func (s server) Delete(ctx context.Context, request *pb.UserId) (*pb.Response, error) {
 	err := s.db.Delete(&model.User{}, request.Id).Error
 	if err != nil {
-		return nil, err
+		log.Println(dbAccessMsg, err)
+		return nil, errInternal
 	}
 	return &pb.Response{Success: true}, nil
 }

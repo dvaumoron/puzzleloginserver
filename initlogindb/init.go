@@ -19,7 +19,7 @@ package main
 
 import (
 	"crypto/sha512"
-	"encoding/hex"
+	"encoding/base64"
 	"errors"
 	"log"
 	"os"
@@ -38,7 +38,7 @@ func salt(password string) string {
 	// TODO improve the security
 	sha512Hasher := sha512.New()
 	sha512Hasher.Write([]byte(password))
-	return hex.EncodeToString(sha512Hasher.Sum(nil))
+	return base64.StdEncoding.EncodeToString(sha512Hasher.Sum(nil))
 }
 
 func main() {
