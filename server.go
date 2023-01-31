@@ -18,7 +18,6 @@
 package main
 
 import (
-	"fmt"
 	"log"
 	"net"
 	"os"
@@ -32,20 +31,20 @@ import (
 
 func main() {
 	if godotenv.Overload() == nil {
-		fmt.Println("Loaded .env file")
+		log.Println("Loaded .env file")
 	}
 
 	lis, err := net.Listen("tcp", ":"+os.Getenv("SERVICE_PORT"))
 	if err != nil {
-		log.Fatalf("Failed to listen : %v", err)
+		log.Fatal("Failed to listen :", err)
 	}
 
 	db := dbclient.Create()
 
 	s := grpc.NewServer()
 	pb.RegisterLoginServer(s, loginserver.New(db))
-	log.Printf("Listening at %v", lis.Addr())
+	log.Println("Listening at", lis.Addr())
 	if err := s.Serve(lis); err != nil {
-		log.Fatalf("Failed to serve : %v", err)
+		log.Fatal("Failed to serve :", err)
 	}
 }
