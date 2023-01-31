@@ -86,7 +86,7 @@ func (s server) Register(ctx context.Context, request *pb.LoginRequest) (*pb.Res
 	return &pb.Response{Success: true, Id: user.ID}, nil
 }
 
-func (s server) ChangeLogin(ctx context.Context, request *pb.ChangeLoginRequest) (*pb.Response, error) {
+func (s server) ChangeLogin(ctx context.Context, request *pb.ChangeRequest) (*pb.Response, error) {
 	var user model.User
 	err := s.db.First(&user, "id = ?", request.UserId).Error
 	if err != nil {
@@ -99,17 +99,21 @@ func (s server) ChangeLogin(ctx context.Context, request *pb.ChangeLoginRequest)
 		return nil, errInternal
 	}
 
-	if request.Salted != user.Password {
+	if request.OldSalted != user.Password {
 		return &pb.Response{}, nil
 	}
-	if err = s.db.Model(&user).Update("login", request.NewLogin).Error; err != nil {
+
+	err = s.db.Model(&user).Updates(map[string]any{
+		"login": request.NewLogin, "password": request.NewSalted,
+	}).Error
+	if err != nil {
 		log.Println(dbAccessMsg, err)
 		return nil, errInternal
 	}
 	return &pb.Response{Success: true}, nil
 }
 
-func (s server) ChangePassword(ctx context.Context, request *pb.ChangePasswordRequest) (*pb.Response, error) {
+func (s server) ChangePassword(ctx context.Context, request *pb.ChangeRequest) (*pb.Response, error) {
 	var user model.User
 	err := s.db.First(&user, "id = ?", request.UserId).Error
 	if err != nil {

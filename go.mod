@@ -4,7 +4,7 @@ go 1.19
 
 require (
 	github.com/dvaumoron/puzzledbclient v1.1.0
-	github.com/dvaumoron/puzzleloginservice v1.6.0
+	github.com/dvaumoron/puzzleloginservice v1.7.0
 	github.com/joho/godotenv v1.4.0
 	google.golang.org/grpc v1.52.3
 	gorm.io/gorm v1.24.3
