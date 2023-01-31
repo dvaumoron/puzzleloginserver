@@ -18,6 +18,7 @@
 package main
 
 import (
+	"fmt"
 	"log"
 	"net"
 	"os"
@@ -30,9 +31,8 @@ import (
 )
 
 func main() {
-	err := godotenv.Load()
-	if err != nil {
-		log.Fatal("Failed to load .env file")
+	if godotenv.Overload() == nil {
+		fmt.Println("Loaded .env file")
 	}
 
 	lis, err := net.Listen("tcp", ":"+os.Getenv("SERVICE_PORT"))
