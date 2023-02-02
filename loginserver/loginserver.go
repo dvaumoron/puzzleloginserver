@@ -158,7 +158,7 @@ func (s server) ListUsers(ctx context.Context, request *pb.RangeRequest) (*pb.Us
 	}
 
 	var users []model.User
-	page := s.paginate(request.Start, request.End)
+	page := s.paginate(request.Start, request.End).Order("login asc")
 	if filter := request.Filter; filter == "" {
 		err = page.Find(&users).Error
 	} else {
