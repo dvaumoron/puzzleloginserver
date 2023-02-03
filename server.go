@@ -18,33 +18,14 @@
 package main
 
 import (
-	"log"
-	"net"
-	"os"
-
 	dbclient "github.com/dvaumoron/puzzledbclient"
+	grpcserver "github.com/dvaumoron/puzzlegrpcserver"
 	"github.com/dvaumoron/puzzleloginserver/loginserver"
 	pb "github.com/dvaumoron/puzzleloginservice"
-	"github.com/joho/godotenv"
-	"google.golang.org/grpc"
 )
 
 func main() {
-	if godotenv.Overload() == nil {
-		log.Println("Loaded .env file")
-	}
-
-	lis, err := net.Listen("tcp", ":"+os.Getenv("SERVICE_PORT"))
-	if err != nil {
-		log.Fatal("Failed to listen :", err)
-	}
-
-	db := dbclient.Create()
-
-	s := grpc.NewServer()
-	pb.RegisterLoginServer(s, loginserver.New(db))
-	log.Println("Listening at", lis.Addr())
-	if err := s.Serve(lis); err != nil {
-		log.Fatal("Failed to serve :", err)
-	}
+	s := grpcserver.New()
+	pb.RegisterLoginServer(s, loginserver.New(dbclient.Create()))
+	s.Start()
 }
