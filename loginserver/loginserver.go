@@ -177,8 +177,7 @@ func (s server) ListUsers(ctx context.Context, request *pb.RangeRequest) (*pb.Us
 }
 
 func (s server) Delete(ctx context.Context, request *pb.UserId) (*pb.Response, error) {
-	err := s.db.Delete(&model.User{}, request.Id).Error
-	if err != nil {
+	if err := s.db.Delete(&model.User{}, request.Id).Error; err != nil {
 		log.Println(dbAccessMsg, err)
 		return nil, errInternal
 	}
