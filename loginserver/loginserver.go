@@ -138,8 +138,7 @@ func (s server) ChangePassword(ctx context.Context, request *pb.ChangeRequest) (
 
 func (s server) GetUsers(ctx context.Context, request *pb.UserIds) (*pb.Users, error) {
 	var users []model.User
-	err := s.db.Find(&users, "id IN ?", request.Ids).Error
-	if err != nil {
+	if err := s.db.Find(&users, "id IN ?", request.Ids).Error; err != nil {
 		log.Println(dbAccessMsg, err)
 		return nil, errInternal
 	}
@@ -162,11 +161,7 @@ func (s server) ListUsers(ctx context.Context, request *pb.RangeRequest) (*pb.Us
 	if filter := request.Filter; filter == "" {
 		err = page.Find(&users).Error
 	} else {
-		var likeBuilder strings.Builder
-		likeBuilder.WriteByte('%')
-		likeBuilder.WriteString(filter)
-		likeBuilder.WriteByte('%')
-		err = page.Find(&users, "login LIKE ?", likeBuilder.String()).Error
+		err = page.Find(&users, "login LIKE ?", buildLikeFilter(filter)).Error
 	}
 
 	if err != nil {
@@ -186,6 +181,19 @@ func (s server) Delete(ctx context.Context, request *pb.UserId) (*pb.Response, e
 
 func (s server) paginate(start uint64, end uint64) *gorm.DB {
 	return s.db.Offset(int(start)).Limit(int(end - start))
+}
+
+func buildLikeFilter(filter string) string {
+	filter = strings.ReplaceAll(filter, ".*", "%")
+	var likeBuilder strings.Builder
+	if strings.IndexByte(filter, '%') != 0 {
+		likeBuilder.WriteByte('%')
+	}
+	likeBuilder.WriteString(filter)
+	if strings.LastIndexByte(filter, '%') != len(filter)-1 {
+		likeBuilder.WriteByte('%')
+	}
+	return likeBuilder.String()
 }
 
 func convertUsersFromModel(users []model.User) []*pb.User {
