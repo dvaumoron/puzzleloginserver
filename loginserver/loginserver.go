@@ -21,8 +21,8 @@ import (
 	"context"
 	"errors"
 	"log"
-	"strings"
 
+	dbclient "github.com/dvaumoron/puzzledbclient"
 	"github.com/dvaumoron/puzzleloginserver/model"
 	pb "github.com/dvaumoron/puzzleloginservice"
 	"gorm.io/gorm"
@@ -157,11 +157,11 @@ func (s server) ListUsers(ctx context.Context, request *pb.RangeRequest) (*pb.Us
 	}
 
 	var users []model.User
-	page := s.paginate(request.Start, request.End).Order("login asc")
+	page := dbclient.Paginate(s.db, request.Start, request.End).Order("login asc")
 	if filter := request.Filter; filter == "" {
 		err = page.Find(&users).Error
 	} else {
-		err = page.Find(&users, "login LIKE ?", buildLikeFilter(filter)).Error
+		err = page.Find(&users, "login LIKE ?", dbclient.BuildLikeFilter(filter)).Error
 	}
 
 	if err != nil {
@@ -177,23 +177,6 @@ func (s server) Delete(ctx context.Context, request *pb.UserId) (*pb.Response, e
 		return nil, errInternal
 	}
 	return &pb.Response{Success: true}, nil
-}
-
-func (s server) paginate(start uint64, end uint64) *gorm.DB {
-	return s.db.Offset(int(start)).Limit(int(end - start))
-}
-
-func buildLikeFilter(filter string) string {
-	filter = strings.ReplaceAll(filter, ".*", "%")
-	var likeBuilder strings.Builder
-	if strings.IndexByte(filter, '%') != 0 {
-		likeBuilder.WriteByte('%')
-	}
-	likeBuilder.WriteString(filter)
-	if strings.LastIndexByte(filter, '%') != len(filter)-1 {
-		likeBuilder.WriteByte('%')
-	}
-	return likeBuilder.String()
 }
 
 func convertUsersFromModel(users []model.User) []*pb.User {

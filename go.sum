@@ -28,8 +28,8 @@ github.com/dmarkham/enumer v1.5.6/go.mod h1:eAawajOQnFBxf0NndBKgbqJImkHytg3eFEng
 github.com/dnaeon/go-vcr v1.1.0/go.mod h1:M7tiix8f0r6mKKJ3Yq/kqU1OYf3MnfmBWVbPx/yU9ko=
 github.com/dnaeon/go-vcr v1.2.0/go.mod h1:R4UdLID7HZT3taECzJs4YgbbH6PIGXB6W/sc5OLb6RQ=
 github.com/dustin/go-humanize v1.0.0/go.mod h1:HtrtbFcZ19U5GC7JDqmcUSB87Iq5E25KnS6fMYU6eOk=
-github.com/dvaumoron/puzzledbclient v1.1.0 h1:WhXKyLr6Ek8XaYbDpEsd5PY7+/YxACw/QhOYPFL5zQg=
-github.com/dvaumoron/puzzledbclient v1.1.0/go.mod h1:KxjDYaNCZHERFrYZgtfydJpN1HZccXV/gWW5XHimi3Y=
+github.com/dvaumoron/puzzledbclient v1.2.0 h1:5O8qQi7SuGk82hGJC2e323ahyCCWtxr4n1853/oTbcE=
+github.com/dvaumoron/puzzledbclient v1.2.0/go.mod h1:KxjDYaNCZHERFrYZgtfydJpN1HZccXV/gWW5XHimi3Y=
 github.com/dvaumoron/puzzlegrpcserver v1.0.1 h1:Vj11s5AKjxZKjTIk3/VOUzT0sJpH8gOnmOlqyZpQlk4=
 github.com/dvaumoron/puzzlegrpcserver v1.0.1/go.mod h1:OBO9CWPuUlh4EyKPHKUAlLqDjs3Wjb1/MH0weG3JcuI=
 github.com/dvaumoron/puzzleloginservice v1.7.0 h1:o5W2j/rbUeSctEe8+yDc49/3R5vzfwtOVH9Lse5BFpc=
