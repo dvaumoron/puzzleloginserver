@@ -32,8 +32,6 @@ const dbAccessMsg = "Failed to access database :"
 
 var errInternal = errors.New("internal service error")
 
-type empty = struct{}
-
 // server is used to implement puzzleloginservice.LoginServer.
 type server struct {
 	pb.UnimplementedLoginServer
@@ -103,8 +101,19 @@ func (s server) ChangeLogin(ctx context.Context, request *pb.ChangeRequest) (*pb
 		return &pb.Response{}, nil
 	}
 
+	newLogin := request.NewLogin
+	err = s.db.First(&user, "login = ?", newLogin).Error
+	if err == nil {
+		// login already used
+		return &pb.Response{}, nil
+	}
+	if !errors.Is(err, gorm.ErrRecordNotFound) {
+		log.Println(dbAccessMsg, err)
+		return nil, errInternal
+	}
+
 	err = s.db.Model(&user).Updates(map[string]any{
-		"login": request.NewLogin, "password": request.NewSalted,
+		"login": newLogin, "password": request.NewSalted,
 	}).Error
 	if err != nil {
 		log.Println(dbAccessMsg, err)
