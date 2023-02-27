@@ -63,8 +63,13 @@ func (s server) Verify(ctx context.Context, request *pb.LoginRequest) (*pb.Respo
 }
 
 func (s server) Register(ctx context.Context, request *pb.LoginRequest) (*pb.Response, error) {
+	login := request.Login
+	if login == "" {
+		return &pb.Response{}, nil
+	}
+
 	var user model.User
-	err := s.db.First(&user, "login = ?", request.Login).Error
+	err := s.db.First(&user, "login = ?", login).Error
 	if err == nil {
 		// login already used, return false (bool default)
 		return &pb.Response{}, nil
@@ -76,7 +81,7 @@ func (s server) Register(ctx context.Context, request *pb.LoginRequest) (*pb.Res
 	}
 
 	// unknown user, create new
-	user = model.User{Login: request.Login, Password: request.Salted}
+	user = model.User{Login: login, Password: request.Salted}
 	if err = s.db.Create(&user).Error; err != nil {
 		log.Println(dbAccessMsg, err)
 		return nil, errInternal
@@ -85,6 +90,11 @@ func (s server) Register(ctx context.Context, request *pb.LoginRequest) (*pb.Res
 }
 
 func (s server) ChangeLogin(ctx context.Context, request *pb.ChangeRequest) (*pb.Response, error) {
+	newLogin := request.NewLogin
+	if newLogin == "" {
+		return &pb.Response{}, nil
+	}
+
 	var user model.User
 	err := s.db.First(&user, "id = ?", request.UserId).Error
 	if err != nil {
@@ -101,7 +111,6 @@ func (s server) ChangeLogin(ctx context.Context, request *pb.ChangeRequest) (*pb
 		return &pb.Response{}, nil
 	}
 
-	newLogin := request.NewLogin
 	err = s.db.First(&user, "login = ?", newLogin).Error
 	if err == nil {
 		// login already used
