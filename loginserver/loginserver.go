@@ -164,8 +164,16 @@ func (s server) GetUsers(ctx context.Context, request *pb.UserIds) (*pb.Users, e
 }
 
 func (s server) ListUsers(ctx context.Context, request *pb.RangeRequest) (*pb.Users, error) {
+	filter := request.Filter
+	noFilter := filter == ""
+
+	userRequest := s.db.Model(&model.User{})
+	if !noFilter {
+		filter = dbclient.BuildLikeFilter(filter)
+		userRequest.Where("login LIKE ?", filter)
+	}
 	var total int64
-	err := s.db.Model(&model.User{}).Count(&total).Error
+	err := userRequest.Count(&total).Error
 	if err != nil {
 		log.Println(dbAccessMsg, err)
 		return nil, errInternal
@@ -176,10 +184,10 @@ func (s server) ListUsers(ctx context.Context, request *pb.RangeRequest) (*pb.Us
 
 	var users []model.User
 	page := dbclient.Paginate(s.db, request.Start, request.End).Order("login asc")
-	if filter := request.Filter; filter == "" {
+	if noFilter {
 		err = page.Find(&users).Error
 	} else {
-		err = page.Find(&users, "login LIKE ?", dbclient.BuildLikeFilter(filter)).Error
+		err = page.Find(&users, "login LIKE ?", filter).Error
 	}
 
 	if err != nil {
