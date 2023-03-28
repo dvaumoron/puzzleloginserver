@@ -9,3 +9,5 @@ buildah config --port 50051 puzzleloginserver-working-container
 buildah config --entrypoint '["/bin/puzzleloginserver"]' puzzleloginserver-working-container
 buildah commit puzzleloginserver-working-container puzzleloginserver
 buildah rm puzzleloginserver-working-container
+
+buildah push puzzleloginserver docker-daemon:puzzleloginserver:latest
