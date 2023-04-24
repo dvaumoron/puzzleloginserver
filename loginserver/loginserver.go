@@ -20,27 +20,28 @@ package loginserver
 import (
 	"context"
 	"errors"
-	"log"
 
 	dbclient "github.com/dvaumoron/puzzledbclient"
 	"github.com/dvaumoron/puzzleloginserver/model"
 	pb "github.com/dvaumoron/puzzleloginservice"
+	"go.uber.org/zap"
 	"gorm.io/gorm"
 )
 
-const dbAccessMsg = "Failed to access database :"
+const dbAccessMsg = "Failed to access database"
 
 var errInternal = errors.New("internal service error")
 
 // server is used to implement puzzleloginservice.LoginServer.
 type server struct {
 	pb.UnimplementedLoginServer
-	db *gorm.DB
+	db     *gorm.DB
+	logger *zap.Logger
 }
 
-func New(db *gorm.DB) pb.LoginServer {
+func New(db *gorm.DB, logger *zap.Logger) pb.LoginServer {
 	db.AutoMigrate(&model.User{})
-	return server{db: db}
+	return server{db: db, logger: logger}
 }
 
 func (s server) Verify(ctx context.Context, request *pb.LoginRequest) (*pb.Response, error) {
@@ -52,7 +53,7 @@ func (s server) Verify(ctx context.Context, request *pb.LoginRequest) (*pb.Respo
 			return &pb.Response{}, nil
 		}
 
-		log.Println(dbAccessMsg, err)
+		s.logger.Error(dbAccessMsg, zap.Error(err))
 		return nil, errInternal
 	}
 
@@ -76,14 +77,14 @@ func (s server) Register(ctx context.Context, request *pb.LoginRequest) (*pb.Res
 	}
 	if !errors.Is(err, gorm.ErrRecordNotFound) {
 		// some technical error, send it
-		log.Println(dbAccessMsg, err)
+		s.logger.Error(dbAccessMsg, zap.Error(err))
 		return nil, errInternal
 	}
 
 	// unknown user, create new
 	user = model.User{Login: login, Password: request.Salted}
 	if err = s.db.Create(&user).Error; err != nil {
-		log.Println(dbAccessMsg, err)
+		s.logger.Error(dbAccessMsg, zap.Error(err))
 		return nil, errInternal
 	}
 	return &pb.Response{Success: true, Id: user.ID}, nil
@@ -103,7 +104,7 @@ func (s server) ChangeLogin(ctx context.Context, request *pb.ChangeRequest) (*pb
 			return &pb.Response{}, nil
 		}
 
-		log.Println(dbAccessMsg, err)
+		s.logger.Error(dbAccessMsg, zap.Error(err))
 		return nil, errInternal
 	}
 
@@ -117,7 +118,7 @@ func (s server) ChangeLogin(ctx context.Context, request *pb.ChangeRequest) (*pb
 		return &pb.Response{}, nil
 	}
 	if !errors.Is(err, gorm.ErrRecordNotFound) {
-		log.Println(dbAccessMsg, err)
+		s.logger.Error(dbAccessMsg, zap.Error(err))
 		return nil, errInternal
 	}
 
@@ -125,7 +126,7 @@ func (s server) ChangeLogin(ctx context.Context, request *pb.ChangeRequest) (*pb
 		"login": newLogin, "password": request.NewSalted,
 	}).Error
 	if err != nil {
-		log.Println(dbAccessMsg, err)
+		s.logger.Error(dbAccessMsg, zap.Error(err))
 		return nil, errInternal
 	}
 	return &pb.Response{Success: true}, nil
@@ -140,7 +141,7 @@ func (s server) ChangePassword(ctx context.Context, request *pb.ChangeRequest) (
 			return &pb.Response{}, nil
 		}
 
-		log.Println(dbAccessMsg, err)
+		s.logger.Error(dbAccessMsg, zap.Error(err))
 		return nil, errInternal
 	}
 
@@ -148,7 +149,7 @@ func (s server) ChangePassword(ctx context.Context, request *pb.ChangeRequest) (
 		return &pb.Response{}, nil
 	}
 	if err = s.db.Model(&user).Update("password", request.NewSalted).Error; err != nil {
-		log.Println(dbAccessMsg, err)
+		s.logger.Error(dbAccessMsg, zap.Error(err))
 		return nil, errInternal
 	}
 	return &pb.Response{Success: true}, nil
@@ -157,7 +158,7 @@ func (s server) ChangePassword(ctx context.Context, request *pb.ChangeRequest) (
 func (s server) GetUsers(ctx context.Context, request *pb.UserIds) (*pb.Users, error) {
 	var users []model.User
 	if err := s.db.Find(&users, "id IN ?", request.Ids).Error; err != nil {
-		log.Println(dbAccessMsg, err)
+		s.logger.Error(dbAccessMsg, zap.Error(err))
 		return nil, errInternal
 	}
 	return &pb.Users{List: convertUsersFromModel(users)}, nil
@@ -175,7 +176,7 @@ func (s server) ListUsers(ctx context.Context, request *pb.RangeRequest) (*pb.Us
 	var total int64
 	err := userRequest.Count(&total).Error
 	if err != nil {
-		log.Println(dbAccessMsg, err)
+		s.logger.Error(dbAccessMsg, zap.Error(err))
 		return nil, errInternal
 	}
 	if total == 0 {
@@ -191,7 +192,7 @@ func (s server) ListUsers(ctx context.Context, request *pb.RangeRequest) (*pb.Us
 	}
 
 	if err != nil {
-		log.Println(dbAccessMsg, err)
+		s.logger.Error(dbAccessMsg, zap.Error(err))
 		return nil, errInternal
 	}
 	return &pb.Users{List: convertUsersFromModel(users), Total: uint64(total)}, nil
@@ -199,7 +200,7 @@ func (s server) ListUsers(ctx context.Context, request *pb.RangeRequest) (*pb.Us
 
 func (s server) Delete(ctx context.Context, request *pb.UserId) (*pb.Response, error) {
 	if err := s.db.Delete(&model.User{}, request.Id).Error; err != nil {
-		log.Println(dbAccessMsg, err)
+		s.logger.Error(dbAccessMsg, zap.Error(err))
 		return nil, errInternal
 	}
 	return &pb.Response{Success: true}, nil

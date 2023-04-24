@@ -3,9 +3,10 @@ module github.com/dvaumoron/puzzleloginserver
 go 1.19
 
 require (
-	github.com/dvaumoron/puzzledbclient v1.2.2
-	github.com/dvaumoron/puzzlegrpcserver v1.1.2
+	github.com/dvaumoron/puzzledbclient v1.2.3
+	github.com/dvaumoron/puzzlegrpcserver v1.2.4
 	github.com/dvaumoron/puzzleloginservice v1.7.0
+	go.uber.org/zap v1.24.0
 	gorm.io/gorm v1.25.0
 )
 
@@ -14,6 +15,7 @@ require (
 	github.com/ClickHouse/clickhouse-go/v2 v2.8.3 // indirect
 	github.com/andybalholm/brotli v1.0.5 // indirect
 	github.com/dustin/go-humanize v1.0.1 // indirect
+	github.com/dvaumoron/puzzlelogger v1.2.1 // indirect
 	github.com/glebarez/go-sqlite v1.21.1 // indirect
 	github.com/glebarez/sqlite v1.8.0 // indirect
 	github.com/go-faster/city v1.0.1 // indirect
@@ -41,6 +43,8 @@ require (
 	github.com/shopspring/decimal v1.3.1 // indirect
 	go.opentelemetry.io/otel v1.14.0 // indirect
 	go.opentelemetry.io/otel/trace v1.14.0 // indirect
+	go.uber.org/atomic v1.10.0 // indirect
+	go.uber.org/multierr v1.9.0 // indirect
 	golang.org/x/crypto v0.6.0 // indirect
 	golang.org/x/net v0.8.0 // indirect
 	golang.org/x/sys v0.6.0 // indirect

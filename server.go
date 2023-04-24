@@ -25,7 +25,7 @@ import (
 )
 
 func main() {
-	s := grpcserver.New()
-	pb.RegisterLoginServer(s, loginserver.New(dbclient.Create()))
+	s := grpcserver.Make()
+	pb.RegisterLoginServer(s, loginserver.New(dbclient.Create(s.Logger), s.Logger))
 	s.Start()
 }
