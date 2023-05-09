@@ -18,14 +18,19 @@
 package main
 
 import (
+	_ "embed"
+
 	dbclient "github.com/dvaumoron/puzzledbclient"
 	grpcserver "github.com/dvaumoron/puzzlegrpcserver"
 	"github.com/dvaumoron/puzzleloginserver/loginserver"
 	pb "github.com/dvaumoron/puzzleloginservice"
 )
 
+//go:embed version.txt
+var version string
+
 func main() {
-	s := grpcserver.Make()
+	s := grpcserver.Make(loginserver.LoginKey, version)
 	pb.RegisterLoginServer(s, loginserver.New(dbclient.Create(s.Logger), s.Logger))
 	s.Start()
 }
