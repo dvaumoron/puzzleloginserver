@@ -3,3 +3,5 @@
 
 # Don't store generated test file
 *.db
+
+version.txt
