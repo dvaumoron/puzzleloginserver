@@ -354,10 +354,14 @@ github.com/dvaumoron/puzzledbclient v1.3.0 h1:FKfl9vx5SmOrR1edLkSeNjrdttVXK8dYol
 github.com/dvaumoron/puzzledbclient v1.3.0/go.mod h1:n7KauRAgw0wp+KQGlwcIyOgnmjWKFCUr99fbw2laONg=
 github.com/dvaumoron/puzzlegrpcserver v1.4.0 h1:1cFzh/P241Yfp2fJb/4p8gibeNNb5eMkm5XhDvgQNIE=
 github.com/dvaumoron/puzzlegrpcserver v1.4.0/go.mod h1:NxF1n4rDAhJ9q2idDMC8HKRwf8fR1GtqJ6DG4of5EMk=
+github.com/dvaumoron/puzzlegrpcserver v1.4.1 h1:80QHEbkBOwcK848fYzdNIj6HWg65myS9R/WvHOYqp7Q=
+github.com/dvaumoron/puzzlegrpcserver v1.4.1/go.mod h1:9332HyRIxuOUvzmKI2e6XE4lMGRjn54qBcuAig6uSF8=
 github.com/dvaumoron/puzzleloginservice v1.7.0 h1:o5W2j/rbUeSctEe8+yDc49/3R5vzfwtOVH9Lse5BFpc=
 github.com/dvaumoron/puzzleloginservice v1.7.0/go.mod h1:K/m2nN30p+uAJamWT85Vh1Mtea7+ahSz+fnIughCok0=
 github.com/dvaumoron/puzzletelemetry v1.1.0 h1:1KMOKBadHZ1vShpaXzF0fuP8B8GCm/jI2VFU3hELuys=
 github.com/dvaumoron/puzzletelemetry v1.1.0/go.mod h1:OKAkWUV8OiGm04oNhhZ32yPTp4qoTVqx4lYA5AJR78A=
+github.com/dvaumoron/puzzletelemetry v1.1.1 h1:7Cvd/VLu6PHce5lXjBSk+xyz3RJieUkXGTBTCSRo0CU=
+github.com/dvaumoron/puzzletelemetry v1.1.1/go.mod h1:OKAkWUV8OiGm04oNhhZ32yPTp4qoTVqx4lYA5AJR78A=
 github.com/elazarl/goproxy v0.0.0-20180725130230-947c36da3153/go.mod h1:/Zj4wYkgs4iZTTu3o/KG3Itv/qCCa8VVMlb3i9OVuzc=
 github.com/emicklei/go-restful v0.0.0-20170410110728-ff4f55a20633/go.mod h1:otzb+WCGbkyDHkqmQmT5YD2WR4BBwUdeQoFo8l/7tVs=
 github.com/emicklei/go-restful v2.9.5+incompatible/go.mod h1:otzb+WCGbkyDHkqmQmT5YD2WR4BBwUdeQoFo8l/7tVs=

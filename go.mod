@@ -4,7 +4,7 @@ go 1.19
 
 require (
 	github.com/dvaumoron/puzzledbclient v1.3.0
-	github.com/dvaumoron/puzzlegrpcserver v1.4.0
+	github.com/dvaumoron/puzzlegrpcserver v1.4.1
 	github.com/dvaumoron/puzzleloginservice v1.7.0
 	github.com/uptrace/opentelemetry-go-extra/otelzap v0.2.0
 	go.uber.org/zap v1.24.0
@@ -17,7 +17,7 @@ require (
 	github.com/andybalholm/brotli v1.0.5 // indirect
 	github.com/cenkalti/backoff/v4 v4.2.1 // indirect
 	github.com/dustin/go-humanize v1.0.1 // indirect
-	github.com/dvaumoron/puzzletelemetry v1.1.0 // indirect
+	github.com/dvaumoron/puzzletelemetry v1.1.1 // indirect
 	github.com/glebarez/go-sqlite v1.21.1 // indirect
 	github.com/glebarez/sqlite v1.8.0 // indirect
 	github.com/go-faster/city v1.0.1 // indirect
